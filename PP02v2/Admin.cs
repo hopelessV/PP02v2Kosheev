@@ -63,7 +63,8 @@ namespace PP02v2
             try
             {
                 data.OpenCon();
-                string order = $@"select [Номер заказа], [Состав заказа], [Дата заказа], [Дата доставки], [Пункт выдачи], [ФИО клиента], [Код для получения], [Статус заказа] from Заказы";
+                string order = $@"select [Номер заказа], [Состав заказа], [Дата заказа], [Дата доставки], 'Пункт выдачи' = [Пункт_выдачи].Улица, [ФИО клиента], [Код для получения], [Статус заказа] from Заказы
+                                  join Пункт_выдачи as t on t.ID = Заказы.[Пункт выдачи]";
                 SqlDataAdapter select_order = new SqlDataAdapter(order, data.GetCon());
                 DataSet set_order = new DataSet();
                 select_order.Fill(set_order);

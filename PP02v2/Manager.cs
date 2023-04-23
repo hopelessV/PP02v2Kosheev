@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -12,12 +13,14 @@ namespace PP02v2
 {
     public partial class Manager : Form
     {
+        data_base data = new data_base();
         int countStr;
         string[] _disc = new string[2];
         public Manager()
         {
             InitializeComponent();
             FillBascet();
+            FillDataGrid();
         }
         private void Division(string text)
         {
@@ -28,6 +31,17 @@ namespace PP02v2
                 return;
             }
             _disc = text.Split('-');
+        }
+        private void FillDataGrid()
+        {
+            data.OpenCon();
+            string order = $@"select [Номер заказа], [Состав заказа], [Дата заказа], [Дата доставки], 'Пункт выдачи' = [Пункт_выдачи].Улица, [ФИО клиента], [Код для получения], [Статус заказа] from Заказы
+                                  join Пункт_выдачи as t on t.ID = Заказы.[Пункт выдачи]";
+            SqlDataAdapter select_order = new SqlDataAdapter(order, data.GetCon());
+            DataSet set_order = new DataSet();
+            select_order.Fill(set_order);
+            dataGridView1.DataSource = set_order.Tables[0];
+            data.CloseCon();
         }
         private void FillBascet()
         {
@@ -125,6 +139,33 @@ namespace PP02v2
         private void Manager_FormClosing(object sender, FormClosingEventArgs e)
         {
             new Authorization().Show(); Hide();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            data.OpenCon();
+            string order = $@"update Заказы set [Состав заказа] = '{textBox2.Text}', [Пункт выдачи] = (select ID from [Пункт_выдачи] where Улица = '{comboBox3.Text}'), [ФИО клиента] = '{textBox4.Text}',
+                              [Код для получения] = {int.Parse(textBox3.Text)}, [Статус заказа] = '{comboBox4.Text}' where [Номер заказа] = {dataGrid_selected_order.ID}";
+            data.CloseCon();
+        }
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            #region[class]
+            dataGrid_selected_order.ID = Convert.ToInt32(dataGridView1.CurrentRow.Cells[0].Value.ToString());
+            dataGrid_selected_order.order_composition = dataGridView1.CurrentRow.Cells[1].Value.ToString();
+            dataGrid_selected_order.order_date = dataGridView1.CurrentRow.Cells[2].Value.ToString();
+            dataGrid_selected_order.delivery_date = dataGridView1.CurrentRow.Cells[3].Value.ToString();
+            dataGrid_selected_order.Point_of_issue = dataGridView1.CurrentRow.Cells[4].Value.ToString();
+            dataGrid_selected_order.FIO_client = dataGridView1.CurrentRow.Cells[5].Value.ToString();
+            dataGrid_selected_order.Code_to_get = dataGridView1.CurrentRow.Cells[6].Value.ToString();
+            dataGrid_selected_order.order_status = dataGridView1.CurrentRow.Cells[7].Value.ToString();
+            #endregion
+            textBox2.Text = dataGridView1.CurrentRow.Cells[1].Value.ToString();
+            comboBox3.Text = dataGridView1.CurrentRow.Cells[4].Value.ToString();
+            textBox4.Text = dataGridView1.CurrentRow.Cells[5].Value.ToString();
+            textBox3.Text = dataGridView1.CurrentRow.Cells[6].Value.ToString();
+            comboBox4.Text = dataGridView1.CurrentRow.Cells[7].Value.ToString();
         }
     }
 }

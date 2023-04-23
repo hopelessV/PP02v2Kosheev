@@ -82,6 +82,7 @@
             this.GenerateCapcha.Text = "Перегенирировать";
             this.GenerateCapcha.UseVisualStyleBackColor = false;
             this.GenerateCapcha.Visible = false;
+            this.GenerateCapcha.Click += new System.EventHandler(this.GenerateCapcha_Click);
             // 
             // textBoxCapcha
             // 
@@ -151,6 +152,7 @@
             this.checkBox1.TabIndex = 21;
             this.checkBox1.Text = "Показать пароль";
             this.checkBox1.UseVisualStyleBackColor = true;
+            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // textBoxLogin
             // 
